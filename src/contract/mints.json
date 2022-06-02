@@ -1,0 +1,21 @@
+{
+  "6ekMJYUBfid5oFzoSXTbGiKy5y8GVqaZaU5Db8DXdUgQ": {
+    "name": "gold",
+    "decimals": 3
+  },
+  "7MEBQqH8Bh6SGixf2m17MQ3k82QCy5rDuiz2KyhhMR57": {
+    "name": "sapphire",
+    "decimals": 1,
+    "//name": "蓝宝石 - 枢要宝石"
+  },
+  "Qg8dmgAtz8mvtCYb2jvXhaGiwmad21ZTfzvUSUoxC3t": {
+    "name": "ruby",
+    "decimals": 1,
+    "//name": "红宝石 - 枢要宝石"
+  },
+  "FQqxj7gX6nVuHSvEqFybhsYtMGrJeP2duDFEaUy5Fw8r": {
+    "name": "amethyst",
+    "decimals": 1,
+    "//name": "紫水晶 - 枢要宝石"
+  }
+}
