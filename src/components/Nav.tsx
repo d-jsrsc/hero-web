@@ -1,6 +1,6 @@
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
   ButtonGroup,
@@ -20,6 +20,7 @@ export function NavHeader() {
   const { setVisible } = useWalletModal();
   const { network, setNetwork } = useContractConfig();
 
+  const location = useLocation();
   let navigate = useNavigate();
 
   const sortPubkey = useMemo(() => {
@@ -31,13 +32,13 @@ export function NavHeader() {
   return (
     <Navbar collapseOnSelect expand="lg" bg="light">
       <Container>
-        <Navbar.Brand href="#home">Helloworld</Navbar.Brand>
+        <Navbar.Brand href="/">Helloworld</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/">
+            {/* <Nav.Link as={Link} to="/">
               Market
-            </Nav.Link>
+            </Nav.Link> */}
           </Nav>
           {/* <Nav>
             {(connected && (
@@ -75,7 +76,11 @@ export function NavHeader() {
                 <Nav.Link
                   as={Button}
                   onClick={() => {
-                    navigate("/selfcenter");
+                    navigate("/selfcenter", {
+                      state: {
+                        backgroundLocation: location,
+                      },
+                    });
                   }}
                   variant="outline-dark"
                 >

@@ -170,10 +170,11 @@ export class Contract {
   }
 
   public async getHeroTrans(owner: PublicKey) {
-    if (!this._program) {
+    if (!this._program || !this._connection) {
       throw new Error("");
     }
 
+    const connection = this._connection;
     const program = this._program;
 
     const [user_markets, _user_markets_bump] =
@@ -184,6 +185,12 @@ export class Contract {
         ],
         program.programId
       );
+    const exist = await connection.getAccountInfo(user_markets);
+    console.log("user_markets", exist);
+    if (!exist) {
+      return [];
+    }
+
     const marketsData = await program.account.userMarkets.fetch(user_markets);
     console.log(marketsData);
     const marketsAccountsInfo =
@@ -201,7 +208,9 @@ export class Contract {
   public async createHeroTrans(
     wallet: WalletContextState,
     depositMint: PublicKey,
-    expectMint: PublicKey
+    depositAmount: number,
+    expectMint: PublicKey,
+    expectAmount: number
   ) {
     if (!this._connection || !this._program || !wallet.publicKey) {
       throw new Error("");
@@ -240,34 +249,36 @@ export class Contract {
     if (depositTokenAccountExist === null)
       throw new Error("depositTokenAccount not exist");
 
-    const receiveTokenAccount = await getAssociatedTokenAddress(
+    const expectTokenAccount = await getAssociatedTokenAddress(
       expectMint,
       wallet.publicKey
     );
 
-    let receiveTokenAccountExist = await connection.getAccountInfo(
-      receiveTokenAccount
+    let expectTokenAccountExist = await connection.getAccountInfo(
+      expectTokenAccount
     );
 
-    // console.log({ depositTokenAccountExist, receiveTokenAccountExist });
-
-    const tx = new Transaction();
-    if (receiveTokenAccountExist === null) {
+    const preInstructions = [];
+    if (expectTokenAccountExist === null) {
       const ataInstruction = createAssociatedTokenAccountInstruction(
         wallet.publicKey,
-        receiveTokenAccount,
+        expectTokenAccount,
         wallet.publicKey,
         expectMint
       );
-      tx.add(ataInstruction);
+
+      preInstructions.push(ataInstruction);
       console.log("add ataInstruction");
     }
 
-    const createInstruction = await program.methods
+    preInstructions.push(
+      await program.account.marketAccount.createInstruction(marketAccount)
+    );
+    const creatTransaction = await program.methods
       .marketCreate(
         vault_account_bump,
-        new anchor.BN(1),
-        new anchor.BN(5),
+        new anchor.BN(depositAmount),
+        new anchor.BN(expectAmount),
         depositMint,
         expectMint
       )
@@ -276,22 +287,23 @@ export class Contract {
         vaultAccount: vault_account_pda,
         mint: depositMint,
         depositTokenAccount: depositTokenAccount,
-        receiveTokenAccount: receiveTokenAccount,
+        receiveTokenAccount: expectTokenAccount,
         marketAccount: marketAccount.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
         tokenProgram: TOKEN_PROGRAM_ID,
         userMarkets: user_markets,
       })
-      .preInstructions([
-        await program.account.marketAccount.createInstruction(marketAccount),
-      ])
+      .preInstructions(preInstructions)
       .transaction();
 
-    tx.add(createInstruction);
-    const signature = await wallet.sendTransaction(tx, connection, {
-      signers: [marketAccount],
-    });
+    const signature = await wallet.sendTransaction(
+      creatTransaction,
+      connection,
+      {
+        signers: [marketAccount],
+      }
+    );
     const latestBlockHash = await connection.getLatestBlockhash();
     const result = await connection.confirmTransaction({
       blockhash: latestBlockHash.blockhash,

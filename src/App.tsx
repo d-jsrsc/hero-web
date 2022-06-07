@@ -37,9 +37,9 @@ import { isProd } from "./utils";
 import Layout from "./components/Layout";
 import Heros from "./pages/Heros";
 import { HerosView, HerosModal } from "./pages/HerosView";
-import Market from "./pages/Market";
+import Home from "./pages/Home";
 import NoMatch from "./pages/NoMatch";
-import SelfCenter from "./pages/SelfCenter";
+import SelfCenter, { SelfCenterModal } from "./pages/SelfCenter";
 
 function AppRoute() {
   let location = useLocation();
@@ -49,7 +49,7 @@ function AppRoute() {
     <>
       <Routes location={state?.backgroundLocation || location}>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Market />} />
+          <Route index element={<Home />} />
           <Route path="/heros" element={<Heros />} />
           <Route path="/heros/:rootkey" element={<HerosView />} />
           <Route path="/selfcenter" element={<SelfCenter />} />
@@ -61,6 +61,7 @@ function AppRoute() {
       {state?.backgroundLocation && (
         <Routes>
           <Route path="/heros/:rootkey" element={<HerosModal />} />
+          <Route path="/selfcenter" element={<SelfCenterModal />} />
         </Routes>
       )}
     </>

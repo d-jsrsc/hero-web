@@ -20,9 +20,18 @@ code {
 }
 
 [data-reach-dialog-content] {
-  width: 90%;
+  display: flex;
+  flex-direction: column;
+  /* width: 94vw; */
+  width: 80%;
+  height: 94vh;
   margin: 3vh auto;
   border-radius: 8px;
+}
+
+.tab-content {
+  height: 100%;
+  overflow: scroll;
 }
 
 .wallet-adapter-button.wallet-adapter-button-trigger {
@@ -137,6 +146,14 @@ a:hover,
     text-decoration: none !important;
 }
 
+select:active,
+select:focus,
+select:hover,
+select:visited,
+select.active,
+select.focus,
+select.hover,
+select.visited,
 input:active,
 input:focus,
 input:hover,
